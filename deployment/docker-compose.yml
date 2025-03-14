@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      -  BANK_POSTGRES_HOST=localhost:5432
+      -  BANK_POSTGRES_DB=bdb
+      -  BANK_POSTGRES_USER=test
+      -  BANK_POSTGRES_PASSWORD=test
+      -  BANK_POSTGRES_SSLMODE=disable
+    depends_on:
+      - db
+    volumes:
+      - ../:/app
+    networks:
+      - app-network
+
+  db:
+    image: postgres:12-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=bdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
